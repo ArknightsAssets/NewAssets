@@ -1,0 +1,60 @@
+name: Download new assets
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron:  '0 * * * *'
+
+jobs:
+  update:
+    name: Update assets
+    runs-on: ubuntu-latest
+    permissions: write-all
+    strategy:
+        matrix:
+          server: [cn, en, jp, kr, tw]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: sudo apt-get install -qq -y dotnet-sdk-6.0
+      - name: Update assets
+        run: |
+          sudo bash download.sh ${{ matrix.server }}
+          echo "VERSION_ID=$(jq -r .versionId "hot_update_list-${{ matrix.server }}.json")" >> $GITHUB_ENV
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: assets_${{ matrix.server }}_${{ env.VERSION_ID }}
+          if-no-files-found: ignore
+          path: |
+            ./bundles
+            ./assets
+  push:
+    name: Update links
+    runs-on: ubuntu-latest
+    permissions: write-all
+    needs: update
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps: 
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    - name: Edit README.md with new files
+      run: |
+        gh api /repos/${{ github.repository }}/actions/artifacts | \
+        jq -r -c '.artifacts | map(select(.workflow_run.id==${{ github.run_id }})) | .[] | "\(.name) \(.id)"' | \
+        while read -r name id; do
+          if [[ $name =~ assets_(.*)_(.*) ]]; then
+            server=${BASH_REMATCH[1]}
+            version=${BASH_REMATCH[2]}
+            sed -i "s|\[$server - .*\]\(.*\)|[$server - $version](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/$id)|" README.md
+            bash download.sh $server test
+          else
+            exit 1
+          fi
+        done
+    - name: Push changes
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+          commit_message: update
