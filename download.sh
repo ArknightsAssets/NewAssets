@@ -26,13 +26,8 @@ download_file() {
     local formatted_path=$(echo "$path" | sed -e "s|/|_|g" -e "s|#|__|" -e "s|\..*|.dat|g")
 
     wget -q -c -P "/tmp/akassets" "${assets_url}/${formatted_path}"
-    if [[ $path == *.ab ]]; then
-        unzip -q -o "/tmp/akassets/${formatted_path}" -d "./bundles"
-        rm "/tmp/akassets/${formatted_path}"
-    else
-        mkdir -p "$(dirname "./bundles/${path}")"
-        mv "/tmp/akassets/${formatted_path}" "./bundles/${path}"
-    fi
+    unzip -q -o "/tmp/akassets/${formatted_path}" -d "./bundles"
+    rm "/tmp/akassets/${formatted_path}"
     echo "${path}"
 }
 
