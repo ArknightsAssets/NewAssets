@@ -22,14 +22,18 @@ jobs:
         run: |
           sudo bash download.sh ${{ matrix.server }}
           echo "VERSION_ID=$(jq -r .versionId "hot_update_list-${{ matrix.server }}.json")" >> $GITHUB_ENV
-      - name: Upload artifacts
+      - name: Upload assets
         uses: actions/upload-artifact@v4
         with:
           name: assets_${{ matrix.server }}_${{ env.VERSION_ID }}
           if-no-files-found: ignore
-          path: |
-            ./bundles
-            ./assets
+          path: ./assets
+      - name: Upload bundles
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundles_${{ matrix.server }}_${{ env.VERSION_ID }}
+          if-no-files-found: ignore
+          path: ./bundles
   push:
     name: Update links
     runs-on: ubuntu-latest
@@ -43,15 +47,14 @@ jobs:
     - name: Edit README.md with new files
       run: |
         gh api /repos/${{ github.repository }}/actions/artifacts | \
-        jq -r -c '.artifacts | map(select(.workflow_run.id==${{ github.run_id }})) | .[] | "\(.name) \(.id)"' | \
-        while read -r name id; do
-          if [[ $name =~ assets_(.*)_(.*) ]]; then
-            server=${BASH_REMATCH[1]}
-            version=${BASH_REMATCH[2]}
-            sed -i "s|\[$server - .*\]\(.*\)|[$server - $version](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/$id)|" README.md
+        jq -r -c '.artifacts | map(select(.workflow_run.id==${{ github.run_id }})) | .[] | "\(.name) \(.id) \(.size_in_bytes)"' | \
+        while read -r name id size; do
+          if [[ $name =~ (.*)_(.*)_(.*) ]]; then
+            type=${BASH_REMATCH[1]}
+            server=${BASH_REMATCH[2]}
+            version=${BASH_REMATCH[3]}
+            sed -i "s|\[${type}_${server}_.*\][(].*[)] [(].*B[)]|[${type}_${server}_${version}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/$id) ($(numfmt --to=iec $size)iB)|" README.md
             bash download.sh $server test
-          else
-            exit 1
           fi
         done
     - name: Push changes
