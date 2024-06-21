@@ -3,7 +3,10 @@ name: Download new assets
 on:
   workflow_dispatch:
   schedule:
-    - cron:  '0 * * * *'
+    - cron:  '*/10 * * * *'
+
+concurrency:
+  group: ${{ github.workflow }}
 
 jobs:
   update:
@@ -46,17 +49,28 @@ jobs:
       uses: actions/checkout@v4
     - name: Edit README.md with new files
       run: |
-        gh api /repos/${{ github.repository }}/actions/artifacts | \
-        jq -r -c '.artifacts | map(select(.workflow_run.id==${{ github.run_id }})) | .[] | "\(.name) \(.id) \(.size_in_bytes)"' | \
         while read -r name id size; do
           if [[ $name =~ (.*)_(.*)_(.*) ]]; then
             type=${BASH_REMATCH[1]}
             server=${BASH_REMATCH[2]}
             version=${BASH_REMATCH[3]}
-            sed -i "s|\[${type}_${server}_.*\][(].*[)] [(].*B[)]|[${type}_${server}_${version}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/$id) ($(numfmt --to=iec $size)iB)|" README.md
+
+            new="[${type}_${server}_${version}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/$id) ($(numfmt --to=iec $size)iB)"
+            hooktext=${hooktext}\\n${new}
+
+            sed -i "s|\[${type}_${server}_.*\][(].*[)] [(].*B[)]|${new}|" README.md
             bash download.sh $server test
           fi
-        done
+        done < <(
+          gh api /repos/${{ github.repository }}/actions/artifacts |
+          jq -r -c '.artifacts | map(select(.workflow_run.id==${{ github.run_id }})) | .[] | "\(.name) \(.id) \(.size_in_bytes)"'
+        )
+
+        if [[ $hooktext != "" ]]; then
+          curl "${{ vars.DISCORD_WEBHOOK }}" -H 'content-type: application/json' \
+            --data-raw "{\"embeds\":[{\"title\":\"New arknights update\",\"description\":\"${hooktext}\"}]}"
+        fi
+
     - name: Push changes
       uses: stefanzweifel/git-auto-commit-action@v5
       with:
