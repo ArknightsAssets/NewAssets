@@ -1,5 +1,5 @@
 # Latest assets
-- cn - [assets_cn_24-07-31-04-23-55-e2099f](https://github.com/ArknightsAssets/NewAssets/actions/runs/10190955654/artifacts/1763011848) (3.0GiB)
+- cn - [assets_cn_24-08-01-19-38-25-0f631d](https://github.com/ArknightsAssets/NewAssets/actions/runs/10208393999/artifacts/1767399909) (938KiB)
 - en - [assets_en_24-08-01-10-01-05-d1264d](https://github.com/ArknightsAssets/NewAssets/actions/runs/10200007180/artifacts/1765068037) (9.1MiB)
 - jp - [assets_jp_24-07-29-11-05-12-162dce](https://github.com/ArknightsAssets/NewAssets/actions/runs/10172648887/artifacts/1758325765) (6.9GiB)
 - kr - [assets_kr_24-07-26-13-31-34-0a0f5c](https://github.com/ArknightsAssets/NewAssets/actions/runs/10172648887/artifacts/1758286949) (6.6GiB)
@@ -8,7 +8,7 @@
 <details>
 <summary>Latest raw bundles</summary>
 
-- cn - [bundles_cn_24-07-31-04-23-55-e2099f](https://github.com/ArknightsAssets/NewAssets/actions/runs/10190955654/artifacts/1763013032) (1.1GiB)
+- cn - [bundles_cn_24-08-01-19-38-25-0f631d](https://github.com/ArknightsAssets/NewAssets/actions/runs/10208393999/artifacts/1767399944) (2.5MiB)
 - en - [bundles_en_24-08-01-10-01-05-d1264d](https://github.com/ArknightsAssets/NewAssets/actions/runs/10200007180/artifacts/1765068138) (5.5MiB)
 - jp - [bundles_jp_24-07-29-11-05-12-162dce](https://github.com/ArknightsAssets/NewAssets/actions/runs/10172648887/artifacts/1758329686) (2.3GiB)
 - kr - [bundles_kr_24-07-26-13-31-34-0a0f5c](https://github.com/ArknightsAssets/NewAssets/actions/runs/10172648887/artifacts/1758289956) (2.2GiB)
