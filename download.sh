@@ -47,6 +47,7 @@ done < <(cat "./hot_update_list-$server.json" | jq -r -c '.abInfos[] | "\(.name)
 
 # download
 curl -s "${assets_url}/hot_update_list.json" | jq . > "./hot_update_list-$server.json"
+if [ ! -s "./hot_update_list-$server.json" ]; then exit 1; fi
 while IFS="," read -r path hash; do
     if [[ "${hash}" != "${old_hash[$path]}" && $test != "test" ]]; then
         download_file "$path"
