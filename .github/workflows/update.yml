@@ -19,8 +19,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Install dependencies
-        run: sudo apt-get install -qq -y dotnet-sdk-6.0
+      - name: Remove all .NET versions
+        run: |
+          sudo apt-get remove --purge -y dotnet* || true
+          sudo apt-get autoremove -y
+          sudo rm -rf /usr/share/dotnet /etc/dotnet
+      - name: Install .NET 6.0
+        uses: actions/setup-dotnet@v4
+        with:
+            dotnet-version: 6.0.x
       - name: Update assets
         run: |
           sudo bash download.sh ${{ matrix.server }}
