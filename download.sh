@@ -9,7 +9,7 @@ case $server in
     "en") network_config_url="https://ak-conf.arknights.global/config/prod/official/network_config";;
     "jp") network_config_url="https://ak-conf.arknights.jp/config/prod/official/network_config";;
     "kr") network_config_url="https://ak-conf.arknights.kr/config/prod/official/network_config";;
-    "tw") network_config_url="https://ak-conf.txwy.tw/config/prod/official/network_config";;
+    "tw") network_config_url="https://ak-conf-tw.gryphline.com/config/prod/official/network_config";;
     "bili") network_config_url="https://ak-conf.hypergryph.com/config/prod/b/network_config";;
     *) network_config_url="https://ak-conf.hypergryph.com/config/prod/official/network_config";;
     # cn is default
