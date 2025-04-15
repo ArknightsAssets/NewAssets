@@ -27,10 +27,15 @@ jobs:
       - name: Install .NET 6.0
         uses: actions/setup-dotnet@v4
         with:
-            dotnet-version: 6.0.x
+          dotnet-version: 6.0.x
+      - name: Install python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13' 
       - name: Update assets
         run: |
-          sudo bash download.sh ${{ matrix.server }}
+          python3 -m pip install requests
+          sudo python3 download.py ${{ matrix.server }}
           echo "VERSION_ID=$(jq -r .versionId "hot_update_list-${{ matrix.server }}.json")" >> $GITHUB_ENV
       - name: Upload assets
         uses: actions/upload-artifact@v4
